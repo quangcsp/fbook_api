@@ -55,4 +55,7 @@ return [
         'unapprove' => 'unapprove',
         'remove_waiting' => 'remove_waiting',
     ],
+    'email_admin' => 'nguyen.van.quangb@framgia.com',
+    'admin' => 'admin',
+    'user' => 'user',
 ];

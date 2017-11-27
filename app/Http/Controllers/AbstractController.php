@@ -66,6 +66,10 @@ abstract class AbstractController extends Controller
             $object = $this->repository->model();
         }
 
+        if ($this->user->role == config('settings.admin')) {
+            return true;
+        }
+
         if (!$this->user || $this->user->cannot($action, $object)) {
             if (!$abort) {
                 return false;
