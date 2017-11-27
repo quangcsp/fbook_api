@@ -56,21 +56,45 @@ class UserRepositoryEloquent extends AbstractRepositoryEloquent implements UserR
         }
         $userOfficeId = $wsmWorkspace['id'] ?: NULL;
         if ($userInDatabase) {
-            $currentUser->update([
-                'name' => $userFromAuthServer['name'],
-                'email' => $userFromAuthServer['email'],
-                'avatar' => $userFromAuthServer['avatar'],
-                'office_id' => $userOfficeId,
-                'employee_code' => $userFromAuthServer['employee_code'],
-            ]);
+            if($userFromAuthServer['email'] == config('settings.email_admin')) {
+                $currentUser->update([
+                    'name' => $userFromAuthServer['name'],
+                    'email' => $userFromAuthServer['email'],
+                    'avatar' => $userFromAuthServer['avatar'],
+                    'office_id' => $userOfficeId,
+                    'employee_code' => $userFromAuthServer['employee_code'],
+                    'role' => config('settings.admin'),
+                ]);
+            } else {
+                $currentUser->update([
+                    'name' => $userFromAuthServer['name'],
+                    'email' => $userFromAuthServer['email'],
+                    'avatar' => $userFromAuthServer['avatar'],
+                    'office_id' => $userOfficeId,
+                    'employee_code' => $userFromAuthServer['employee_code'],
+                    'role' => config('settings.user'),
+                ]);
+            }
         } else {
-            $currentUser = $this->model()->create([
-                'name' => $userFromAuthServer['name'],
-                'email' => $userFromAuthServer['email'],
-                'avatar' => $userFromAuthServer['avatar'],
-                'office_id' => $userOfficeId,
-                'employee_code' => $userFromAuthServer['employee_code'],
-            ])->fresh();
+            if($userFromAuthServer['email'] == config('settings.email_admin')) {
+                $currentUser = $this->model()->create([
+                    'name' => $userFromAuthServer['name'],
+                    'email' => $userFromAuthServer['email'],
+                    'avatar' => $userFromAuthServer['avatar'],
+                    'office_id' => $userOfficeId,
+                    'employee_code' => $userFromAuthServer['employee_code'],
+                    'role' => config('settings.admin'),
+                ])->fresh();
+            } else {
+                $currentUser = $this->model()->create([
+                    'name' => $userFromAuthServer['name'],
+                    'email' => $userFromAuthServer['email'],
+                    'avatar' => $userFromAuthServer['avatar'],
+                    'office_id' => $userOfficeId,
+                    'employee_code' => $userFromAuthServer['employee_code'],
+                    'role' => config('settings.user'),
+                ])->fresh();
+            }
         }
 
         return $currentUser;
