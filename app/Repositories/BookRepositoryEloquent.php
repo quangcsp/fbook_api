@@ -5,8 +5,10 @@ namespace App\Repositories;
 use App\Contracts\Repositories\BookRepository;
 use App\Contracts\Repositories\UserRepository;
 use App\Eloquent\Book;
+use App\Eloquent\Media;
 use App\Eloquent\User;
 use App\Eloquent\BookUser;
+use App\Eloquent\UpdateBook;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
@@ -39,6 +41,11 @@ class BookRepositoryEloquent extends AbstractRepositoryEloquent implements BookR
     public function model()
     {
         return new \App\Eloquent\Book;
+    }
+
+    public function updateBookModel()
+    {
+        return new \App\Eloquent\UpdateBook;
     }
 
     public function getDataInHomepage($with = [], $dataSelect = ['*'], $officeId = '')
@@ -469,6 +476,51 @@ class BookRepositoryEloquent extends AbstractRepositoryEloquent implements BookR
         );
     }
 
+    protected function updateMediasForBook(array $medias, Book $book, MediaRepository $mediaRepository)
+    {
+        $dataMedias = [];
+
+        foreach ($medias as $media) {
+            $dataMedias[] = array_only($media, ['file', 'id']);
+        }
+
+        $mediaRepository->updateMedias(
+            $book,
+            $dataMedias,
+            strtolower(class_basename($this->model()))
+        );
+    }
+
+    protected function uploadAndSaveMediasForUpdateBook(array $medias, UpdateBook $updateBook, MediaRepository $mediaRepository)
+    {
+        $dataMedias = [];
+
+        foreach ($medias as $media) {
+            $dataMedias[] = array_only($media, ['file', 'type']);
+        }
+
+        $mediaRepository->uploadAndSaveEditMedias(
+            $updateBook,
+            $dataMedias,
+            strtolower(class_basename($this->model()))
+        );
+    }
+
+    protected function updateMediasForUpdateBook(array $medias, UpdateBook $updateBook, MediaRepository $mediaRepository)
+    {
+        $dataMedias = [];
+
+        foreach ($medias as $media) {
+            $dataMedias[] = array_only($media, ['file', 'id', 'type']);
+        }
+
+        $mediaRepository->updateEditMedias(
+            $updateBook,
+            $dataMedias,
+            strtolower(class_basename($this->model()))
+        );
+    }
+
     /**
      * Get book info by code
      *
@@ -547,12 +599,12 @@ class BookRepositoryEloquent extends AbstractRepositoryEloquent implements BookR
 
         $book->update($dataBook);
 
-        if (isset($attributes['medias'])) {
-            foreach ($book->media as $media) {
-                $this->destroyFile($media->path);
-            }
 
-            $book->media()->delete();
+        if (isset($attributes['update'])) {
+            $this->updateMediasForBook($attributes['update'], $book, $mediaRepository);
+        }
+
+        if (isset($attributes['medias'])) {
             $this->uploadAndSaveMediasForBook($attributes['medias'], $book, $mediaRepository);
         }
 
@@ -754,5 +806,31 @@ class BookRepositoryEloquent extends AbstractRepositoryEloquent implements BookR
     public function getBookByOffice($officeId, $dataSelect = ['*'], $with = [])
     {
         return $this->select($dataSelect)->with($with)->where('office_id', $officeId)->paginate(config('paginate.default'));
+    }
+
+    public function requestUpdateBook(array $attributes, Book $book, MediaRepository $mediaRepository)
+    {
+        $dataBook = array_only($attributes, $this->updateBookModel()->getFillable());
+        $bookWithCurrentCode = $this->getBookByCode($attributes['code']);
+
+        if ($bookWithCurrentCode && $bookWithCurrentCode->id != $book->id) {
+            throw new ActionException(__FUNCTION__);
+        }
+
+        $dataBook['user_id'] = $this->user->id;
+
+        $bookRequestId = $book->updateBooks()->create($dataBook)->id;
+
+        $bookRequest = app(UpdateBook::class)->find($bookRequestId);
+        if ($bookRequest) {
+            if (isset($attributes['update'])) {
+                $this->updateMediasForUpdateBook($attributes['update'], $bookRequest, $mediaRepository);
+            }
+
+            if (isset($attributes['medias'])) {
+                $this->uploadAndSaveMediasForUpdateBook($attributes['medias'], $bookRequest, $mediaRepository);
+            }
+        }
+
     }
 }

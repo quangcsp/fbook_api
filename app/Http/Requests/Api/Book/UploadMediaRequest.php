@@ -25,7 +25,7 @@ class UploadMediaRequest extends AbstractRequest
     {
         return [
             'book_id' => 'required|exists:books,id',
-            'medias' => 'required|array|max:3|unique_book_image:type',
+            'medias' => 'required|array|unique_book_image:type',
             'medias.*' => 'required|array|max:2',
             'medias.*.file' => 'required|image|mimes:jpeg,jpg,gif,bmp,png|max:10240',
             'medias.*.type' => 'required|numeric|between:0,1',

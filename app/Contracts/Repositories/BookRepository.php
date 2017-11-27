@@ -42,4 +42,6 @@ interface BookRepository extends AbstractRepository
     public function approve(Book $book, $attribute = []);
 
     public function getBookByOffice($categoryId, $dataSelect = ['*'], $with = []);
+
+    public function requestUpdateBook(array $attributes, Book $book, MediaRepository $mediaRepository);
 }

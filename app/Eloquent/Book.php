@@ -50,6 +50,11 @@ class Book extends Model
         return $this->belongsToMany(User::class, 'owners')->withPivot('status');
     }
 
+    public function updateBooks()
+    {
+        return $this->hasMany(UpdateBook::class);
+    }
+
     public function usersReading()
     {
         return $this->users()->wherePivot('status', config('model.book_user.status.reading'));
