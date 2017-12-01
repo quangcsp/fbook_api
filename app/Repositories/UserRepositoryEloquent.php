@@ -5,6 +5,7 @@ namespace App\Repositories;
 use App\Contracts\Repositories\UserRepository;
 use App\Exceptions\Api\ActionException;
 use App\Eloquent\Book;
+use App\Eloquent\UpdateBook;
 use App\Eloquent\Office;
 use App\Eloquent\Category;
 use App\Eloquent\UserFollow;
@@ -364,5 +365,22 @@ class UserRepositoryEloquent extends AbstractRepositoryEloquent implements UserR
     public function updateViewNotificationsAll()
     {
         $update_view = app(Notification::class)->where('viewed', config('model.notification.not_view'))->update(['viewed' => config('model.notification.viewed')]);
+    }
+
+    public function getWaitingApproveEditBook($dataSelect = ['*'])
+    {
+        return app(UpdateBook::class)
+            ->select($dataSelect)
+            ->with([
+                'category',
+                'office',
+                'updateMedia',
+                'userRequest',
+                'currentBookInfo' => function($query) {
+                    $query->with(['media']);
+                }
+            ])
+            ->orderBy('created_at', 'DESC')
+            ->paginate(config('paginate.default'));
     }
 }

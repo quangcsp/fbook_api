@@ -127,6 +127,18 @@ class BookController extends ApiController
         }, __FUNCTION__);
     }
 
+    public function requestUpdate(UpdateRequest $request, $id, MediaRepository $mediaRepository)
+    {
+        $data = $request->all();
+
+        return $this->doAction(function() use ($data, $id, $mediaRepository) {
+            $book = $this->repository->findOrFail($id);
+            $this->before('update', $book);
+
+            $this->compacts['item'] = $this->repository->requestUpdateBook($data, $book, $mediaRepository);
+        }, __FUNCTION__);
+    }
+
     public function increaseView($id)
     {
         return $this->doAction(function() use ($id) {

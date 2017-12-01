@@ -29,7 +29,7 @@ class StoreRequest extends AbstractRequest
             'publish_date' => 'nullable|date_format:Y-m-d',
             'category_id' => 'required|numeric|exists:categories,id',
             'office_id' => 'required|numeric|exists:offices,id',
-            'medias' => 'array|max:3|unique_book_image:type',
+            'medias' => 'array|unique_book_image:type',
             'medias.*' => 'required|array|max:2',
             'medias.*.file' => 'required|image|mimes:jpeg,jpg,gif,bmp,png|max:10240',
             'medias.*.type' => 'required|numeric|between:0,1',

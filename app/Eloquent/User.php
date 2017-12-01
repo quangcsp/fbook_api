@@ -81,6 +81,11 @@ class User extends Authenticatable
         return $this->hasMany(UserFollow::class, 'follower_id');
     }
 
+    public function updateBooks()
+    {
+        return $this->hasMany(UpdateBook::class);
+    }
+
     public function notifications()
     {
         return $this->hasMany(Notification::class, 'user_send_id', 'user_receive_id');

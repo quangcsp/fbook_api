@@ -22,6 +22,18 @@ class UserController extends ApiController
         'office_id'
     ];
 
+    protected $updateBookSelect = [
+        'id',
+        'user_id',
+        'book_id',
+        'title',
+        'description',
+        'author',
+        'publish_date',
+        'category_id',
+        'office_id'
+    ];
+
     protected $imageSelect = [
         'path',
         'size',
@@ -193,6 +205,13 @@ class UserController extends ApiController
     {
         return $this->requestAction(function() {
             $this->repository->updateViewNotificationsAll();
+        });
+    }
+
+    public function getWaitingApproveEditBook()
+    {
+        return $this->requestAction(function() {
+            $this->compacts['item'] = $this->repository->getWaitingApproveEditBook($this->updateBookSelect);
         });
     }
 }

@@ -70,5 +70,10 @@ Route::group(['prefix' => 'v0', 'as' => 'api.v0.', 'namespace' => 'Api'], functi
         Route::get('notifications/count/user', ['as' => 'notifications.count', 'uses' => 'UserController@getCountNotifications']);
         Route::post('notifications/update/all', ['as' => 'notifications.update.all', 'uses' => 'UserController@updateViewNotificationsAll']);
         Route::get('notifications/dropdown', ['as' => 'users.notifications.dropdown', 'uses' => 'UserController@getNotificationsDropdown']);
+        Route::put('books/{book_id}/request_update', ['as' => 'books.request.update', 'uses' => 'BookController@requestUpdate']);
+    });
+
+    Route::group(['prefix' => 'admin', 'middleware' => 'admin'], function () {
+        Route::get('waiting-update-book', ['as' => 'users.waiting-update-book', 'uses' => 'UserController@getWaitingApproveEditBook']);
     });
 });
