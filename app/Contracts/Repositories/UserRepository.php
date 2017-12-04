@@ -35,4 +35,6 @@ interface UserRepository extends AbstractRepository
     public function getFavoriteCategory($id);
 
     public function updateViewNotificationsAll();
+
+    public function getWaitingApproveEditBook();
 }

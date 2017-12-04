@@ -30,7 +30,7 @@ class UpdateRequest extends AbstractRequest
             'code' => 'required|max:100',
             'category_id' => 'required|numeric|exists:categories,id',
             'office_id' => 'required|numeric|exists:offices,id',
-            'medias' => 'array|unique_book_image:type',
+            'medias' => 'array|max:3|unique_book_image:type',
             'medias.*' => 'required|array|max:2',
             'medias.*.file' => 'required|image|mimes:jpeg,jpg,gif,bmp,png|max:10240',
             'medias.*.type' => 'required|numeric|between:0,1',

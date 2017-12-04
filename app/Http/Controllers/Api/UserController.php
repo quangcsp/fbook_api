@@ -31,7 +31,8 @@ class UserController extends ApiController
         'author',
         'publish_date',
         'category_id',
-        'office_id'
+        'office_id',
+        'created_at'
     ];
 
     protected $imageSelect = [

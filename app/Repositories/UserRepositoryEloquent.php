@@ -377,10 +377,10 @@ class UserRepositoryEloquent extends AbstractRepositoryEloquent implements UserR
                 'updateMedia',
                 'userRequest',
                 'currentBookInfo' => function($query) {
-                    $query->with(['media']);
+                    $query->with(['category', 'office', 'media']);
                 }
             ])
-            ->orderBy('created_at', 'DESC')
+            ->orderBy('created_at', 'ASC')
             ->paginate(config('paginate.default'));
     }
 }

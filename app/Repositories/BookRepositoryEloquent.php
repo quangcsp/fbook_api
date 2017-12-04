@@ -588,29 +588,6 @@ class BookRepositoryEloquent extends AbstractRepositoryEloquent implements BookR
         return $book->load('category', 'office', 'media');
     }
 
-    public function update(array $attributes, Book $book, MediaRepository $mediaRepository)
-    {
-        $dataBook = array_only($attributes, $this->model()->getFillable());
-        $bookWithCurrentCode = $this->getBookByCode($attributes['code']);
-
-        if ($bookWithCurrentCode && $bookWithCurrentCode->id != $book->id) {
-            throw new ActionException(__FUNCTION__);
-        }
-
-        $book->update($dataBook);
-
-
-        if (isset($attributes['update'])) {
-            $this->updateMediasForBook($attributes['update'], $book, $mediaRepository);
-        }
-
-        if (isset($attributes['medias'])) {
-            $this->uploadAndSaveMediasForBook($attributes['medias'], $book, $mediaRepository);
-        }
-
-        return $book->load('category', 'office', 'media');
-    }
-
     public function destroy(Book $book)
     {
         $book->delete();
@@ -831,6 +808,64 @@ class BookRepositoryEloquent extends AbstractRepositoryEloquent implements BookR
                 $this->uploadAndSaveMediasForUpdateBook($attributes['medias'], $bookRequest, $mediaRepository);
             }
         }
+    }
 
+    public function approveRequestUpdateBook($updateBookId)
+    {
+        $updateBook = app(UpdateBook::class)->findOrFail($updateBookId);
+        $dataBookUpdate = [
+            'title' => $updateBook['title'],
+            'description' => $updateBook['description'],
+            'author' => $updateBook['author'],
+            'publish_date' => $updateBook['publish_date'],
+            'category_id' => $updateBook['category_id'],
+            'office_id' => $updateBook['office_id']
+        ];
+
+        $updateBook->currentBookInfo()->update($dataBookUpdate);
+        $currentBook = $updateBook->currentBookInfo;
+
+        foreach ($updateBook->updateMedia as $updateMedia) {
+            if ($updateMedia['media_id'] != NULL) {
+                $dataFile = [
+                    'name' => $updateMedia['name'],
+                    'size' => $updateMedia['size'],
+                    'type' => $updateMedia['type'],
+                    'path' => $updateMedia['path']
+                ];
+
+                $currentMedia = $currentBook->media()->findOrFail($updateMedia['media_id']);
+                if ($currentMedia) {
+                    if (isset($dataFile)) {
+                        $this->destroyFile($currentMedia->path);
+                        $currentMedia->update($dataFile);
+                    }
+                }
+
+                $dataFile = [];
+            } else {
+                $dataFile = [
+                    'name' => $updateMedia['name'],
+                    'size' => $updateMedia['size'],
+                    'type' => $updateMedia['type'],
+                    'path' => $updateMedia['path']
+                ];
+
+                $currentBook->media()->create($dataFile);
+                $dataFile = [];
+            }
+        }
+        $updateBook->delete();
+    }
+
+    public function deleteRequestUpdateBook($updateBookId)
+    {
+        $updateBook = app(UpdateBook::class)->findOrFail($updateBookId);
+
+        foreach ($updateBook->updateMedia as $updateMedia) {
+            $this->destroyFile($updateMedia->path);
+        }
+
+        $updateBook->delete();
     }
 }
