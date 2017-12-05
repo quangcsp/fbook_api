@@ -115,18 +115,6 @@ class BookController extends ApiController
         });
     }
 
-    public function update(UpdateRequest $request, $id, MediaRepository $mediaRepository)
-    {
-        $data = $request->all();
-
-        return $this->doAction(function() use ($data, $id, $mediaRepository) {
-            $book = $this->repository->findOrFail($id);
-            $this->before('update', $book);
-
-            $this->compacts['item'] = $this->repository->update($data, $book, $mediaRepository);
-        }, __FUNCTION__);
-    }
-
     public function requestUpdate(UpdateRequest $request, $id, MediaRepository $mediaRepository)
     {
         $data = $request->all();
@@ -136,6 +124,22 @@ class BookController extends ApiController
             $this->before('update', $book);
 
             $this->compacts['item'] = $this->repository->requestUpdateBook($data, $book, $mediaRepository);
+        }, __FUNCTION__);
+    }
+
+    public function approveRequestUpdate(Request $request, $updateBookId)
+    {
+        return $this->doAction(function() use ($updateBookId) {
+
+            $this->repository->approveRequestUpdateBook($updateBookId);
+        }, __FUNCTION__);
+    }
+
+    public function deleteRequestUpdate($updateBookId)
+    {
+        return $this->doAction(function() use ($updateBookId) {
+
+            $this->repository->deleteRequestUpdateBook($updateBookId);
         }, __FUNCTION__);
     }
 

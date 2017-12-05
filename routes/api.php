@@ -75,5 +75,7 @@ Route::group(['prefix' => 'v0', 'as' => 'api.v0.', 'namespace' => 'Api'], functi
 
     Route::group(['prefix' => 'admin', 'middleware' => 'admin'], function () {
         Route::get('waiting-update-book', ['as' => 'users.waiting-update-book', 'uses' => 'UserController@getWaitingApproveEditBook']);
+        Route::post('books/approve-request-edit/{update_book_id}', ['as' => 'books.approve.request.edit', 'uses' => 'BookController@approveRequestUpdate']);
+        Route::delete('books/delete-request-edit/{update_book_id}', ['as' => 'books.delete.request.edit', 'uses' => 'BookController@deleteRequestUpdate']);
     });
 });

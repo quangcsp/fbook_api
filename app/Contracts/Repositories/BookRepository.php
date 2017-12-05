@@ -23,8 +23,6 @@ interface BookRepository extends AbstractRepository
 
     public function store(array $attributes, MediaRepository $mediaRepository);
 
-    public function update(array $attributes, Book $book, MediaRepository $mediaRepository);
-
     public function destroy(Book $book);
 
     public function getBookByCategory($categoryId, $dataSelect = ['*'], $with = [], $officeId = '');
@@ -44,4 +42,8 @@ interface BookRepository extends AbstractRepository
     public function getBookByOffice($categoryId, $dataSelect = ['*'], $with = []);
 
     public function requestUpdateBook(array $attributes, Book $book, MediaRepository $mediaRepository);
+
+    public function approveRequestUpdateBook($updateBookId);
+
+    public function deleteRequestUpdateBook($updateBookId);
 }
