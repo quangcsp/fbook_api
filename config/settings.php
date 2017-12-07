@@ -55,7 +55,16 @@ return [
         'unapprove' => 'unapprove',
         'remove_waiting' => 'remove_waiting',
     ],
-    'email_admin' => 'nguyen.van.quangb@framgia.com',
+    'email_admin' => [
+        'nguyen.van.quangb@framgia.com',
+        'hoang.nhu.tam@framgia.com',
+        'nguyen.thi.duy.phuong@framgia.com',
+        'doan.thuy.phuong@framgia.com',
+        'hoang.nhac.trung@framgia.com',
+        'huynh.quang.diep@framgia.com',
+        'trinh.duc.toan@framgia.com',
+        'pham.thi.nhai@framgia.com',
+    ],
     'admin' => 'admin',
     'user' => 'user',
 ];

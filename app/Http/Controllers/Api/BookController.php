@@ -123,7 +123,7 @@ class BookController extends ApiController
             $book = $this->repository->findOrFail($id);
             $this->before('update', $book);
 
-            $this->compacts['item'] = $this->repository->requestUpdateBook($data, $book, $mediaRepository);
+            $this->repository->requestUpdateBook($data, $book, $mediaRepository);
         }, __FUNCTION__);
     }
 

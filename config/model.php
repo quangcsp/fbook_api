@@ -96,5 +96,10 @@ return [
         'remove_book'=> '0',
         'viewed' => true,
         'not_view' => false,
-    ]
+        'admin' => [
+            'request_edit_book' => 'request_edit_book',
+            'approve_request_update_book' => 'approve_edit_book',
+            'delete_request_update_book' => 'delete_edit_book',
+        ],
+    ],
 ];

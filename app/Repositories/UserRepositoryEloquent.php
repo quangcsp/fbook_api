@@ -57,7 +57,7 @@ class UserRepositoryEloquent extends AbstractRepositoryEloquent implements UserR
         }
         $userOfficeId = $wsmWorkspace['id'] ?: NULL;
         if ($userInDatabase) {
-            if($userFromAuthServer['email'] == config('settings.email_admin')) {
+            if(in_array($userFromAuthServer['email'], config('settings.email_admin'))) {
                 $currentUser->update([
                     'name' => $userFromAuthServer['name'],
                     'email' => $userFromAuthServer['email'],
@@ -77,7 +77,7 @@ class UserRepositoryEloquent extends AbstractRepositoryEloquent implements UserR
                 ]);
             }
         } else {
-            if($userFromAuthServer['email'] == config('settings.email_admin')) {
+            if(in_array($userFromAuthServer['email'], config('settings.email_admin'))) {
                 $currentUser = $this->model()->create([
                     'name' => $userFromAuthServer['name'],
                     'email' => $userFromAuthServer['email'],
