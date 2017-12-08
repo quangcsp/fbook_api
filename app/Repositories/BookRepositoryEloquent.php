@@ -808,6 +808,21 @@ class BookRepositoryEloquent extends AbstractRepositoryEloquent implements BookR
                 $this->uploadAndSaveMediasForUpdateBook($attributes['medias'], $bookRequest, $mediaRepository);
             }
         }
+
+        foreach (config('settings.email_admin') as $admin) {
+            $user_admin_id = app(User::class)->where('email', $admin)->first()->id;
+            Event::fire('androidNotification', config('model.notification.admin.request_edit_book'));
+            $message = '' . $this->user->name . ' request edit book: ' . $book->title;
+            event(new NotificationHandler($message, $user_admin_id, config('model.notification.admin.request_edit_book')));
+            Event::fire('notification', [
+                [
+                    'current_user_id' => $this->user->id,
+                    'get_user_id' => $user_admin_id,
+                    'target_id' => $book->id,
+                    'type' => config('model.notification.admin.request_edit_book'),
+                ]
+            ]);
+        }
     }
 
     public function approveRequestUpdateBook($updateBookId)
@@ -855,12 +870,36 @@ class BookRepositoryEloquent extends AbstractRepositoryEloquent implements BookR
                 $dataFile = [];
             }
         }
+        Event::fire('androidNotification', config('model.notification.admin.approve_request_update_book'));
+        $message = '' . $this->user->name . ' approve request update book: ' . $updateBook->title;
+        event(new NotificationHandler($message, $updateBook->user_id, config('model.notification.admin.approve_request_update_book')));
+        Event::fire('notification', [
+            [
+                'current_user_id' => $this->user->id,
+                'get_user_id' => $updateBook->user_id,
+                'target_id' => $updateBook->book_id,
+                'type' => config('model.notification.admin.approve_request_update_book'),
+            ]
+        ]);
+
         $updateBook->delete();
     }
 
     public function deleteRequestUpdateBook($updateBookId)
     {
         $updateBook = app(UpdateBook::class)->findOrFail($updateBookId);
+
+        Event::fire('androidNotification', config('model.notification.admin.delete_request_update_book'));
+        $message = '' . $this->user->name . ' Delete request edit book: ' . $updateBook->title;
+        event(new NotificationHandler($message, $updateBook->user_id, config('model.notification.admin.delete_request_update_book')));
+        Event::fire('notification', [
+            [
+                'current_user_id' => $this->user->id,
+                'get_user_id' => $updateBook->user_id,
+                'target_id' => $updateBook->book_id,
+                'type' => config('model.notification.admin.delete_request_update_book'),
+            ]
+        ]);
 
         foreach ($updateBook->updateMedia as $updateMedia) {
             $this->destroyFile($updateMedia->path);

@@ -39,7 +39,7 @@ class Admin
         Auth::guard('fauth')->setUser($currentUser);
 
         if ($currentUser->role != config('settings.admin')) {
-            throw new NotAdminException();
+            throw new UnknownException(translate('exception.not_admin'), 401);
         }
 
         return $next($request);
